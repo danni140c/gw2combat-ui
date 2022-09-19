@@ -13,14 +13,22 @@ export enum Class {
 }
 
 export enum WeaponType {
-  Invalid = 0,
-  EmptyHanded,
-  Greatsword,
-  Sword,
-  Axe,
-  Torch,
-  Scepter,
-  Focus,
-  KitConjure,
-  Tome,
+  Invalid = 'INVALID',
+  EmptyHanded = 'EMPTY_HANDED',
+  Greatsword = 'GREATSWORD',
+  Sword = 'SWORD',
+  Axe = 'AXE',
+  Torch = 'TORCH',
+  Scepter = 'SCEPTER',
+  Focus = 'FOCUS',
+  KitConjure = 'KIT_CONJURE',
+  Tome = 'TOME',
+}
+
+export enum WeaponPosition {
+  Invalid = 'INVALID',
+  Universal = 'UNIVERSAL',
+  MainHand = 'MAIN_HAND',
+  OffHand = 'OFF_HAND',
+  TwoHanded = 'TWO_HANDED',
 }
