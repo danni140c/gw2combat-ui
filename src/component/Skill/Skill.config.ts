@@ -1,135 +1,270 @@
-import { Class, WeaponType, WeaponPosition } from '../../util/types';
+import { Class, WeaponType, WeaponPosition, Effect } from '../../util/types';
+import { reduceReducers } from '../../util';
 
-/* skill_key */
-export type SkillKeyStateType = {
+export type SkillType = {
+  skillKey: SkillKey;
+  isChildSkill: boolean;
+
+  weaponType: WeaponType;
+  weaponPosition: WeaponPosition;
+  damageCoefficient: number;
+
+  castDuration: [number, number];
+  cooldown: [number, number];
+
+  strikeOnTickList: [number[], number[]];
+  pulseOnTickList: [number[], number[]];
+
+  onStrikeEffectApplication: EffectApplication[];
+  onPulseEffectApplication: EffectApplication[];
+
+  childSkillKeys: SkillKey[];
+  tags: SkillTag[];
+
+  attributeModifiers: AttributeModifiers;
+  damageModifiers: DamageModifiers;
+
+  equipBundle: {
+    name: string;
+  };
+
+  ammo: number;
+  rechargeDuration: number;
+  numTargets: number;
+};
+
+type SkillKey = {
   baseClass: Class;
   name: string;
 };
 
-export const initialSkillKey = {
-  baseClass: Class.Invalid,
-  name: '',
+type EffectApplication = {
+  uniqueEffectType: {
+    name: string;
+  };
+  effectType: Effect;
+  direction: Direction;
+  baseDuration: number;
+  numStacks: number;
+  numTargets: number;
 };
 
-type SkillKeyActionType = {
-  baseClass?: Class;
-  name?: string;
-  type: SkillKeyAction;
-};
+enum Direction {
+  INVALID = 'Invalid',
 
-enum SkillKeyAction {
-  UpdateBaseClass = 'UPDATE_BASE_CLASS',
-  UpdateName = 'UPDATE_NAME',
+  OUTGOING = 'OUTGOING',
+  SELF = 'SELF',
+  TEAM = 'TEAM',
 }
 
-export const skillKeyReducer = (
-  state: SkillKeyStateType = initialSkillKey,
-  action: SkillKeyActionType
-): SkillKeyStateType => {
-  switch (action.type) {
-    case SkillKeyAction.UpdateBaseClass:
-      const { baseClass = Class.Invalid } = action;
-      return { ...state, baseClass };
-    case SkillKeyAction.UpdateName:
-      const { name = '' } = action;
-      return { ...state, name };
-    default:
-      return state;
-  }
+enum SkillTag {
+  INVALID = 'Invalid',
+
+  CANNOT_CRITICAL_STRIKE = 'CANNOT_CRITICAL_STRIKE',
+  CONSECRATION_ATTACK = 'CONSECRATION_ATTACK',
+  CONSECRATION_CAST = 'CONSECRATION_CAST',
+  TRAP = 'TRAP',
+  MANTRA = 'MANTRA',
+  SYMBOL = 'SYMBOL',
+  SPIRIT_WEAPON = 'SPIRIT_WEAPON',
+  GUARDIAN_VIRTUE = 'GUARDIAN_VIRTUE',
+  TOME = 'TOME',
+}
+
+type AttributeModifiers = {
+  powerAddend: number;
+  precisionAddend: number;
+  toughnessAddend: number;
+  vitalityAddend: number;
+  concentrationAddend: number;
+  conditionDamageAddend: number;
+  expertiseAddend: number;
+  ferocityAddend: number;
+  healingPowerAddend: number;
+  armorAddend: number;
+  maxHealthAddend: number;
+
+  boonDurationPctAddend: number;
+  criticalChancePctAddend: number;
+  criticalDamagePctAddend: number;
+  conditionDurationPctAddend: number;
+  burningDurationPctAddend: number;
+  bleedingDurationPctAddend: number;
+  confusionDurationPctAddend: number;
+  poisonDurationPctAddend: number;
+  tormentDurationPctAddend: number;
 };
 
-export const skillKeyUpdateBaseClass = (value: Class): SkillKeyActionType => ({
-  type: SkillKeyAction.UpdateBaseClass,
-  baseClass: value,
-});
+type DamageModifiers = {
+  strikeDamageMultiplier: number;
+  strikeDamageMultiplierAddGroupAddend: number;
+  conditionDamageMultiplier: number;
+  conditionDamageMultiplierAddGroupAddend: number;
+  burningDamageMultiplier: number;
+  bleedingDamageMultiplier: number;
+  confusionDamageMultiplier: number;
+  poisonDamageMultiplier: number;
+  tormentDamageMultiplier: number;
 
-export const skillKeyUpdateName = (value: string): SkillKeyActionType => ({
-  type: SkillKeyAction.UpdateName,
-  name: value,
-});
-
-/* weapon_type */
-export type WeaponTypeStateType = WeaponType;
-
-export const initialWeaponType = WeaponType.Invalid;
-
-type WeaponTypeActionType = {
-  weaponType: WeaponType;
+  conditionDurationPctAddend: number;
+  burningDurationPctAddend: number;
+  bleedingDurationPctAddend: number;
+  confusionDurationPctAddend: number;
+  poisonDurationPctAddend: number;
+  tormentDurationPctAddend: number;
 };
 
-export const weaponTypeReducer = (
-  state: WeaponTypeStateType = initialWeaponType,
-  action: WeaponTypeActionType
-): WeaponTypeStateType => {
-  const { weaponType } = action;
-  return weaponType;
+type SkillAction = Partial<SkillType> & { type: SkillActionType };
+
+enum SkillActionType {
+  UPDATE_BASE_CLASS = 'UPDATE_BASE_CLASS',
+  UPDATE_SKILL_KEY_NAME = 'UPDATE_NAME',
+
+  UPDATE_ATTRIBUTE_MODIFIERS_POWER_ADDEND = 'UPDATE_ATTRIBUTE_MODIFIERS_POWER_ADDEND',
+  UPDATE_ATTRIBUTE_MODIFIERS_PRECISION_ADDEND = 'UPDATE_ATTRIBUTE_MODIFIERS_PRECISION_ADDEND',
+
+  UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER = 'UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER',
+  UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER_ADD_GROUP_ADDEND = 'UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER_ADD_GROUP_ADDEND',
+}
+
+export const initialSkillState: SkillType = {
+  skillKey: {
+    baseClass: Class.INVALID,
+    name: '',
+  },
+  isChildSkill: false,
+  weaponType: WeaponType.INVALID,
+  weaponPosition: WeaponPosition.UNIVERSAL,
+  damageCoefficient: 0.0,
+  castDuration: [0, 0],
+  cooldown: [0, 0],
+  strikeOnTickList: [[], []],
+  pulseOnTickList: [[], []],
+  onStrikeEffectApplication: [],
+  onPulseEffectApplication: [],
+  childSkillKeys: [],
+  tags: [],
+  attributeModifiers: {
+    powerAddend: 0.0,
+    precisionAddend: 0.0,
+    toughnessAddend: 0.0,
+    vitalityAddend: 0.0,
+    concentrationAddend: 0.0,
+    conditionDamageAddend: 0.0,
+    expertiseAddend: 0.0,
+    ferocityAddend: 0.0,
+    healingPowerAddend: 0.0,
+    armorAddend: 0.0,
+    maxHealthAddend: 0.0,
+    boonDurationPctAddend: 0.0,
+    criticalChancePctAddend: 0.0,
+    criticalDamagePctAddend: 0.0,
+    conditionDurationPctAddend: 0.0,
+    burningDurationPctAddend: 0.0,
+    bleedingDurationPctAddend: 0.0,
+    confusionDurationPctAddend: 0.0,
+    poisonDurationPctAddend: 0.0,
+    tormentDurationPctAddend: 0.0,
+  },
+  damageModifiers: {
+    strikeDamageMultiplier: 1,
+    strikeDamageMultiplierAddGroupAddend: 0.0,
+    conditionDamageMultiplier: 1,
+    conditionDamageMultiplierAddGroupAddend: 0.0,
+    burningDamageMultiplier: 1,
+    bleedingDamageMultiplier: 1,
+    confusionDamageMultiplier: 1,
+    poisonDamageMultiplier: 1,
+    tormentDamageMultiplier: 1,
+    conditionDurationPctAddend: 0.0,
+    burningDurationPctAddend: 0.0,
+    bleedingDurationPctAddend: 0.0,
+    confusionDurationPctAddend: 0.0,
+    poisonDurationPctAddend: 0.0,
+    tormentDurationPctAddend: 0.0,
+  },
+  equipBundle: {
+    name: '',
+  },
+  ammo: 1,
+  rechargeDuration: 0,
+  numTargets: 1,
 };
 
-export const weaponTypeUpdate = (value: WeaponType): WeaponTypeActionType => ({
-  weaponType: value,
-});
-
-/* weapon_position */
-export type WeaponPositionStateType = WeaponPosition;
-
-export const initialWeaponPosition = WeaponPosition.Invalid;
-
-type WeaponPositionActionType = {
-  weaponPosition: WeaponPosition;
+export const skillReducer = (
+  state: SkillType,
+  action: Partial<SkillType>
+): SkillType => {
+  return { ...state, ...action };
 };
 
-export const weaponPositionReducer = (
-  state: WeaponPositionStateType = initialWeaponPosition,
-  action: WeaponPositionActionType
-) => {
-  const { weaponPosition } = action;
-  return weaponPosition;
-};
-
-export const weaponPositionUpdate = (
-  value: WeaponPosition
-): WeaponPositionActionType => ({
-  weaponPosition: value,
-});
-
-/* damage_coefficient */
-export type DamageCoefficientStateType = Number;
-
-export const initialDamageCoefficient = 0.0;
-
-type DamageCoefficientActionType = {
-  damageCoefficient: Number;
-};
-
-export const damageCoefficientReducer = (
-  state: DamageCoefficientStateType = initialDamageCoefficient,
-  action: DamageCoefficientActionType
-) => {
-  const { damageCoefficient } = action;
-  return damageCoefficient;
-};
-
-export const damageCoefficientUpdate = (value: Number) => ({
-  damageCoefficient: value,
-});
-
-/* cast_duration */
-export type CastDurationStateType = Number[];
-
-export const initialCastDuration = [0, 0];
-
-type CastDurationActionType = {
-  castDuration: Number[];
-};
-
-export const castDurationReducer = (
-  state: CastDurationStateType = initialCastDuration,
-  action: CastDurationActionType
-) => {
-  const { castDuration } = action;
-  return castDuration;
-};
-
-export const castDurationUpdate = (value: Number[]) => ({
-  castDuration: value,
-});
+/* const skillAttributeModifiersReducer = ( */
+/*   state: SkillType, */
+/*   action: SkillAction */
+/* ) => { */
+/*   const { type } = action; */
+/*   switch (type) { */
+/*     case SkillActionType.UPDATE_ATTRIBUTE_MODIFIERS_POWER_ADDEND: */
+/*       const { */
+/*         attributeModifiers: { */
+/*           powerAddend = initialSkillState.attributeModifiers.powerAddend, */
+/*         } = {}, */
+/*       } = action; */
+/*       return { */
+/*         ...state, */
+/*         attributeModifiers: { ...state.attributeModifiers, powerAddend }, */
+/*       }; */
+/*     case SkillActionType.UPDATE_ATTRIBUTE_MODIFIERS_PRECISION_ADDEND: */
+/*       const { */
+/*         attributeModifiers: { */
+/*           precisionAddend = initialSkillState.attributeModifiers */
+/*             .precisionAddend, */
+/*         } = {}, */
+/*       } = action; */
+/*       return { */
+/*         ...state, */
+/*         attributeModifiers: { ...state.attributeModifiers, precisionAddend }, */
+/*       }; */
+/*     default: */
+/*       return state; */
+/*   } */
+/* }; */
+/**/
+/* const skillDamageModifiersReducer = (state: SkillType, action: SkillAction) => { */
+/*   const { type } = action; */
+/*   switch (type) { */
+/*     case SkillActionType.UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER: */
+/*       const { */
+/*         damageModifiers: { */
+/*           strikeDamageMultiplier = initialSkillState.damageModifiers */
+/*             .strikeDamageMultiplier, */
+/*         } = {}, */
+/*       } = action; */
+/*       return { */
+/*         ...state, */
+/*         damageModifiers: { ...state.damageModifiers, strikeDamageMultiplier }, */
+/*       }; */
+/*     case SkillActionType.UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER_ADD_GROUP_ADDEND: */
+/*       const { */
+/*         damageModifiers: { */
+/*           strikeDamageMultiplierAddGroupAddend = initialSkillState */
+/*             .damageModifiers.strikeDamageMultiplierAddGroupAddend, */
+/*         } = {}, */
+/*       } = action; */
+/*       return { */
+/*         ...state, */
+/*         damageModifiers: { */
+/*           ...state.damageModifiers, */
+/*           strikeDamageMultiplierAddGroupAddend, */
+/*         }, */
+/*       }; */
+/*     default: */
+/*       return state; */
+/*   } */
+/* }; */
+/**/
+/* export const skillRootReducer = reduceReducers( */
+/*   skillBaseReducer, */
+/*   skillAttributeModifiersReducer, */
+/*   skillDamageModifiersReducer */
+/* ); */

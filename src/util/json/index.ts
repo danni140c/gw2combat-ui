@@ -1,5 +1,5 @@
 const replacer = function (key: any, value: any) {
-  if (value && typeof value === 'object') {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
     const replacement: Object = {};
     for (const k in value) {
       if (Object.hasOwnProperty.call(value, k)) {
