@@ -1,10 +1,11 @@
-import React, { useReducer, useEffect } from 'react';
-import { Class, WeaponType, WeaponPosition } from '../../util/types';
+import React, { useReducer, useEffect, useCallback, useMemo } from 'react';
 import Skill from './Skill.component';
-import { SkillType, initialSkillState, skillReducer } from './Skill.config';
+import { initialSkillState, skillReducer, SkillType } from './Skill.config';
+import { updateBaseClass, updateSkillKeyName } from './Skill.config';
+import { throttle, debounce } from 'lodash';
 
 type Props = {
-  onUpdate?: Function;
+  onUpdate?: (...args: any) => any;
 };
 
 const updateSkill =
@@ -15,16 +16,34 @@ const updateSkill =
 const SkillContainer = (props: Props) => {
   const [skill, skillDispatch] = useReducer(skillReducer, initialSkillState);
 
-  const containerFunctions = {};
+  const containerFunctions = {
+    updateBaseClass: updateSkill((value: any) =>
+      skillDispatch(updateBaseClass(value))
+    ),
+    updateSkillKeyName: updateSkill((value: any) =>
+      skillDispatch(updateSkillKeyName(value))
+    ),
+  };
 
-  const containerProps = {};
+  const { onUpdate = () => {} } = props;
+  const debouncedThrottledUpdate = useMemo(
+    () =>
+      debounce(
+        throttle((skill) => onUpdate(skill), 1000),
+        1000
+      ),
+    [onUpdate]
+  );
+  const handleUpdate = useCallback(
+    (skill: SkillType) => debouncedThrottledUpdate(skill),
+    [debouncedThrottledUpdate]
+  );
 
   useEffect(() => {
-    const { onUpdate = () => {} } = props;
-    onUpdate(skill);
+    handleUpdate(skill);
   });
 
-  return <Skill {...containerFunctions} {...containerProps} />;
+  return <Skill {...containerFunctions} skill={skill} />;
 };
 
 export default SkillContainer;

@@ -1,5 +1,5 @@
 import { Class, WeaponType, WeaponPosition, Effect } from '../../util/types';
-import { reduceReducers } from '../../util';
+import { merge } from 'lodash';
 
 export type SkillType = {
   skillKey: SkillKey;
@@ -114,18 +114,13 @@ type DamageModifiers = {
   tormentDurationPctAddend: number;
 };
 
-type SkillAction = Partial<SkillType> & { type: SkillActionType };
-
-enum SkillActionType {
-  UPDATE_BASE_CLASS = 'UPDATE_BASE_CLASS',
-  UPDATE_SKILL_KEY_NAME = 'UPDATE_NAME',
-
-  UPDATE_ATTRIBUTE_MODIFIERS_POWER_ADDEND = 'UPDATE_ATTRIBUTE_MODIFIERS_POWER_ADDEND',
-  UPDATE_ATTRIBUTE_MODIFIERS_PRECISION_ADDEND = 'UPDATE_ATTRIBUTE_MODIFIERS_PRECISION_ADDEND',
-
-  UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER = 'UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER',
-  UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER_ADD_GROUP_ADDEND = 'UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER_ADD_GROUP_ADDEND',
-}
+type RecursivePartial<T> = {
+  [P in keyof T]?: T[P] extends (infer U)[]
+    ? RecursivePartial<U>[]
+    : T[P] extends object
+    ? RecursivePartial<T[P]>
+    : T[P];
+};
 
 export const initialSkillState: SkillType = {
   skillKey: {
@@ -191,12 +186,26 @@ export const initialSkillState: SkillType = {
   numTargets: 1,
 };
 
+export type SkillAction = RecursivePartial<SkillType>;
+
 export const skillReducer = (
   state: SkillType,
-  action: Partial<SkillType>
+  action: SkillAction
 ): SkillType => {
-  return { ...state, ...action };
+  return merge({}, state, action);
 };
+
+export const updateBaseClass = (value: Class): SkillAction => ({
+  skillKey: {
+    baseClass: value,
+  },
+});
+
+export const updateSkillKeyName = (value: string): SkillAction => ({
+  skillKey: {
+    name: value,
+  },
+});
 
 /* const skillAttributeModifiersReducer = ( */
 /*   state: SkillType, */
