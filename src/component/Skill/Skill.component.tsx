@@ -3,11 +3,6 @@ import { initialSkillState, SkillType } from './Skill.config';
 import { Class, WeaponType, WeaponPosition } from '../../util/types';
 import {
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
   Grid,
   Accordion,
   AccordionSummary,
@@ -43,7 +38,7 @@ export const Skill: React.FC<Props> = (props: Props) => {
   const {
     skill: {
       damageCoefficient,
-      castDuration: [castDurationNoQuick, castDurationQuick],
+      castDuration: [castDurationNoQuick],
       attributeModifiers,
       damageModifiers,
     },
@@ -146,7 +141,7 @@ const renderModifiers = (
   title: string,
   modifiers: object,
   updateModifier: React.ChangeEventHandler<HTMLInputElement>,
-  currentModifiers: { [key: string]: number }
+  currentModifiers: { [key: string]: number | undefined }
 ) => (
   <Accordion>
     <AccordionSummary expandIcon={<ExpandMoreIcon />}>

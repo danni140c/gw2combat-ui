@@ -1,9 +1,5 @@
 import { Class, WeaponType, WeaponPosition, Effect } from '../../util/types';
-import {
-  ensureInt,
-  ensureFloat,
-  ensureUnsignedInt,
-} from '../../util/validation';
+import { ensureFloat, ensureUnsignedInt } from '../../util/validation';
 import { merge } from 'lodash';
 
 export type SkillType = {
@@ -77,6 +73,7 @@ enum SkillTag {
 }
 
 export type AttributeModifier = {
+  [key: string]: number | undefined;
   powerAddend: number;
   precisionAddend: number;
   toughnessAddend: number;
@@ -101,6 +98,7 @@ export type AttributeModifier = {
 };
 
 export type DamageModifier = {
+  [key: string]: number | undefined;
   strikeDamageMultiplier: number;
   strikeDamageMultiplierAddGroupAddend: number;
   conditionDamageMultiplier: number;
@@ -261,17 +259,35 @@ export const updateCastDurationQuick = (value: string): SkillAction => ({
 export const updateAttributeModifier = (
   value: string,
   name: string
-): SkillAction => ({
-  attributeModifiers: {
-    [name]: ensureFloat(value, 0.0),
-  },
-});
+): SkillAction => {
+  if (initialSkillState.attributeModifiers[name] === undefined) {
+    return {};
+  }
+
+  return {
+    attributeModifiers: {
+      [name]: ensureFloat(
+        value,
+        initialSkillState.attributeModifiers[name] as number
+      ),
+    },
+  };
+};
 
 export const updateDamageModifier = (
   value: string,
   name: string
-): SkillAction => ({
-  damageModifiers: {
-    [name]: ensureFloat(value, 0.0),
-  },
-});
+): SkillAction => {
+  if (initialSkillState.damageModifiers[name] === undefined) {
+    return {};
+  }
+
+  return {
+    damageModifiers: {
+      [name]: ensureFloat(
+        value,
+        initialSkillState.damageModifiers[name] as number
+      ),
+    },
+  };
+};
