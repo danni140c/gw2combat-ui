@@ -1,4 +1,9 @@
 import { Class, WeaponType, WeaponPosition, Effect } from '../../util/types';
+import {
+  ensureInt,
+  ensureFloat,
+  ensureUnsignedInt,
+} from '../../util/validation';
 import { merge } from 'lodash';
 
 export type SkillType = {
@@ -21,8 +26,8 @@ export type SkillType = {
   childSkillKeys: SkillKey[];
   tags: SkillTag[];
 
-  attributeModifiers: AttributeModifiers;
-  damageModifiers: DamageModifiers;
+  attributeModifiers: AttributeModifier;
+  damageModifiers: DamageModifier;
 
   equipBundle: {
     name: string;
@@ -71,7 +76,7 @@ enum SkillTag {
   TOME = 'TOME',
 }
 
-type AttributeModifiers = {
+export type AttributeModifier = {
   powerAddend: number;
   precisionAddend: number;
   toughnessAddend: number;
@@ -95,7 +100,7 @@ type AttributeModifiers = {
   tormentDurationPctAddend: number;
 };
 
-type DamageModifiers = {
+export type DamageModifier = {
   strikeDamageMultiplier: number;
   strikeDamageMultiplierAddGroupAddend: number;
   conditionDamageMultiplier: number;
@@ -186,13 +191,29 @@ export const initialSkillState: SkillType = {
   numTargets: 1,
 };
 
-export type SkillAction = RecursivePartial<SkillType>;
+export type SkillAction = RecursivePartial<SkillType> & {
+  type?: SkillReducerType;
+};
+
+enum SkillReducerType {
+  UPDATE_CAST_DURATION_NO_QUICKNESS = 'UPDATE_CAST_DURATION_NO_QUICKNESS',
+  UPDATE_CAST_DURATION_QUICKNESS = 'UPDATE_CAST_DURATION_QUICKNESS',
+}
 
 export const skillReducer = (
   state: SkillType,
   action: SkillAction
 ): SkillType => {
-  return merge({}, state, action);
+  switch (action.type) {
+    /* case SkillReducerType.UPDATE_CAST_DURATION_NO_ALAC: */
+    /*   const { castDuration = [] } = action; */
+    /*   return { */
+    /*     ...state, */
+    /*     castDuration: [castDuration[0], state.castDuration[1]], */
+    /*   }; */
+    default:
+      return merge({}, state, action);
+  }
 };
 
 export const updateBaseClass = (value: Class): SkillAction => ({
@@ -207,73 +228,50 @@ export const updateSkillKeyName = (value: string): SkillAction => ({
   },
 });
 
-/* const skillAttributeModifiersReducer = ( */
-/*   state: SkillType, */
-/*   action: SkillAction */
-/* ) => { */
-/*   const { type } = action; */
-/*   switch (type) { */
-/*     case SkillActionType.UPDATE_ATTRIBUTE_MODIFIERS_POWER_ADDEND: */
-/*       const { */
-/*         attributeModifiers: { */
-/*           powerAddend = initialSkillState.attributeModifiers.powerAddend, */
-/*         } = {}, */
-/*       } = action; */
-/*       return { */
-/*         ...state, */
-/*         attributeModifiers: { ...state.attributeModifiers, powerAddend }, */
-/*       }; */
-/*     case SkillActionType.UPDATE_ATTRIBUTE_MODIFIERS_PRECISION_ADDEND: */
-/*       const { */
-/*         attributeModifiers: { */
-/*           precisionAddend = initialSkillState.attributeModifiers */
-/*             .precisionAddend, */
-/*         } = {}, */
-/*       } = action; */
-/*       return { */
-/*         ...state, */
-/*         attributeModifiers: { ...state.attributeModifiers, precisionAddend }, */
-/*       }; */
-/*     default: */
-/*       return state; */
-/*   } */
-/* }; */
-/**/
-/* const skillDamageModifiersReducer = (state: SkillType, action: SkillAction) => { */
-/*   const { type } = action; */
-/*   switch (type) { */
-/*     case SkillActionType.UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER: */
-/*       const { */
-/*         damageModifiers: { */
-/*           strikeDamageMultiplier = initialSkillState.damageModifiers */
-/*             .strikeDamageMultiplier, */
-/*         } = {}, */
-/*       } = action; */
-/*       return { */
-/*         ...state, */
-/*         damageModifiers: { ...state.damageModifiers, strikeDamageMultiplier }, */
-/*       }; */
-/*     case SkillActionType.UPDATE_DAMAGE_MODIFIERS_STRIKE_DAMAGE_MULTIPLIER_ADD_GROUP_ADDEND: */
-/*       const { */
-/*         damageModifiers: { */
-/*           strikeDamageMultiplierAddGroupAddend = initialSkillState */
-/*             .damageModifiers.strikeDamageMultiplierAddGroupAddend, */
-/*         } = {}, */
-/*       } = action; */
-/*       return { */
-/*         ...state, */
-/*         damageModifiers: { */
-/*           ...state.damageModifiers, */
-/*           strikeDamageMultiplierAddGroupAddend, */
-/*         }, */
-/*       }; */
-/*     default: */
-/*       return state; */
-/*   } */
-/* }; */
-/**/
-/* export const skillRootReducer = reduceReducers( */
-/*   skillBaseReducer, */
-/*   skillAttributeModifiersReducer, */
-/*   skillDamageModifiersReducer */
-/* ); */
+export const updateIsChildSkill = (value: boolean): SkillAction => ({
+  isChildSkill: value,
+});
+
+export const updateWeaponType = (value: WeaponType): SkillAction => ({
+  weaponType: value,
+});
+
+export const updateWeaponPosition = (value: WeaponPosition): SkillAction => ({
+  weaponPosition: value,
+});
+
+export const updateDamageCoefficient = (value: string): SkillAction => ({
+  damageCoefficient: ensureFloat(value, initialSkillState.damageCoefficient),
+});
+
+export const updateCastDurationNoQuick = (value: string): SkillAction => ({
+  castDuration: [
+    ensureUnsignedInt(value, initialSkillState.castDuration[0]),
+    0,
+  ],
+});
+
+export const updateCastDurationQuick = (value: string): SkillAction => ({
+  castDuration: [
+    0,
+    ensureUnsignedInt(value, initialSkillState.castDuration[1]),
+  ],
+});
+
+export const updateAttributeModifier = (
+  value: string,
+  name: string
+): SkillAction => ({
+  attributeModifiers: {
+    [name]: ensureFloat(value, 0.0),
+  },
+});
+
+export const updateDamageModifier = (
+  value: string,
+  name: string
+): SkillAction => ({
+  damageModifiers: {
+    [name]: ensureFloat(value, 0.0),
+  },
+});

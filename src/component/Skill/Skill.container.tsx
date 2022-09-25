@@ -1,28 +1,57 @@
 import React, { useReducer, useEffect, useCallback, useMemo } from 'react';
 import Skill from './Skill.component';
 import { initialSkillState, skillReducer, SkillType } from './Skill.config';
-import { updateBaseClass, updateSkillKeyName } from './Skill.config';
+import {
+  updateBaseClass,
+  updateSkillKeyName,
+  updateIsChildSkill,
+  updateWeaponType,
+  updateWeaponPosition,
+  updateDamageCoefficient,
+  updateCastDurationNoQuick,
+  updateAttributeModifier,
+  updateDamageModifier,
+} from './Skill.config';
 import { throttle, debounce } from 'lodash';
+import { SelectChangeEvent } from '@mui/material';
 
 type Props = {
   onUpdate?: (...args: any) => any;
 };
 
-const updateSkill =
-  (updater: Function) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    updater(e.currentTarget.value);
-  };
+const updateGenerator =
+  (dispatch: Function) =>
+  (action: Function) =>
+  (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLSelectElement>
+      | SelectChangeEvent<string>
+  ) =>
+    dispatch(action(e.target.value, e.target.name));
 
-const SkillContainer = (props: Props) => {
+const selectUpdateGenerator =
+  (dispatch: Function) =>
+  (action: Function) =>
+  (_: React.SyntheticEvent<Element, Event>, value: any) =>
+    dispatch(action(value));
+
+export const SkillContainer: React.FC<Props> = (props: Props) => {
   const [skill, skillDispatch] = useReducer(skillReducer, initialSkillState);
 
+  const updater = updateGenerator(skillDispatch);
+  const selectUpdater = selectUpdateGenerator(skillDispatch);
+
   const containerFunctions = {
-    updateBaseClass: updateSkill((value: any) =>
-      skillDispatch(updateBaseClass(value))
-    ),
-    updateSkillKeyName: updateSkill((value: any) =>
-      skillDispatch(updateSkillKeyName(value))
-    ),
+    updateBaseClass: selectUpdater(updateBaseClass),
+    updateSkillKeyName: updater(updateSkillKeyName),
+    updateIsChildSkill: updater(updateIsChildSkill),
+    updateWeaponType: selectUpdater(updateWeaponType),
+    updateWeaponPosition: selectUpdater(updateWeaponPosition),
+    updateDamageCoefficient: updater(updateDamageCoefficient),
+    updateCastDurationNoQuick: updater(updateCastDurationNoQuick),
+    updateAttributeModifier: updater(updateAttributeModifier),
+    updateDamageModifier: updater(updateDamageModifier),
   };
 
   const { onUpdate = () => {} } = props;
@@ -46,4 +75,4 @@ const SkillContainer = (props: Props) => {
   return <Skill {...containerFunctions} skill={skill} />;
 };
 
-export default SkillContainer;
+export default React.memo(SkillContainer);
