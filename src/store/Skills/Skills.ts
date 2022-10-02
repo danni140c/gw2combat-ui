@@ -55,7 +55,7 @@ type EffectApplication = {
   numTargets: number;
 };
 
-enum Direction {
+export enum Direction {
   INVALID = 'Invalid',
 
   OUTGOING = 'OUTGOING',
@@ -63,7 +63,7 @@ enum Direction {
   TEAM = 'TEAM',
 }
 
-enum SkillTag {
+export enum SkillTag {
   INVALID = 'Invalid',
 
   CANNOT_CRITICAL_STRIKE = 'CANNOT_CRITICAL_STRIKE',
@@ -317,16 +317,16 @@ export const skillsSlice = createSlice({
     },
     setPulseOnTick: (
       state,
-      action: PayloadAction<{ idx: number; value: string; pulseIdx: number }>
+      action: PayloadAction<[idx: number, value: string, pulseIdx: number]>
     ) => {
-      const { idx, value, pulseIdx } = action.payload;
+      const [idx, value, pulseIdx] = action.payload;
       state[idx].pulseOnTickList[0][pulseIdx] = ensureUnsignedInt(value, 0);
     },
     setPulseOnTickQuickness: (
       state,
-      action: PayloadAction<{ idx: number; value: string; pulseIdx: number }>
+      action: PayloadAction<[idx: number, value: string, pulseIdx: number]>
     ) => {
-      const { idx, value, pulseIdx } = action.payload;
+      const [idx, value, pulseIdx] = action.payload;
       state[idx].pulseOnTickList[1][pulseIdx] = ensureUnsignedInt(value, 0);
     },
     addStrikeEffectApplication: (state, action: PayloadAction<number>) => {
@@ -451,16 +451,16 @@ export const skillsSlice = createSlice({
     },
     setChildBaseClass: (
       state,
-      action: PayloadAction<{ idx: number; value: string; childIdx: number }>
+      action: PayloadAction<[idx: number, value: string, childIdx: number]>
     ) => {
-      const { idx, value, childIdx } = action.payload;
+      const [idx, value, childIdx] = action.payload;
       state[idx].childSkillKeys[childIdx].baseClass = value as BaseClass;
     },
     setChildSkillName: (
       state,
-      action: PayloadAction<{ idx: number; value: string; childIdx: number }>
+      action: PayloadAction<[ idx: number, value: string, childIdx: number ]>
     ) => {
-      const { idx, value, childIdx } = action.payload;
+      const [ idx, value, childIdx ] = action.payload;
       state[idx].childSkillKeys[childIdx].name = value;
     },
     addTag: (state, action: PayloadAction<number>) => {
@@ -473,9 +473,9 @@ export const skillsSlice = createSlice({
     },
     setTag: (
       state,
-      action: PayloadAction<{ idx: number; value: string; tagIdx: number }>
+      action: PayloadAction<[idx: number, value: SkillTag, tagIdx: number]>
     ) => {
-      const { idx, value, tagIdx } = action.payload;
+      const [idx, value, tagIdx] = action.payload;
       state[idx].tags[tagIdx] = value as SkillTag;
     },
     setAttributeModifier: (

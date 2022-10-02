@@ -15,10 +15,26 @@ import {
   removeStrikeOnTick,
   setStrikeOnTick,
   setStrikeOnTickQuickness,
+  addPulseOnTick,
+  removePulseOnTick,
+  setPulseOnTick,
+  setPulseOnTickQuickness,
+  addChildSkillKey,
+  removeChildSkillKey,
+  setChildBaseClass,
+  setChildSkillName,
+  addTag,
+  removeTag,
+  setTag,
   setAttributeModifier,
   setDamageModifier,
+  setEquipBundleName,
+  setAmmo,
+  setRechargeDuration,
+  setNumTargets,
   SkillType,
   SkillPayload,
+  SkillTag,
 } from '../../store/Skills';
 import { RootState } from '../../store';
 import { connect, ConnectedProps } from 'react-redux';
@@ -53,6 +69,25 @@ const mapDispatchToProps = {
   setStrikeOnTickQuickness: (
     payload: [idx: number, value: string, strikeIdx: number]
   ) => setStrikeOnTickQuickness(payload),
+  addPulseOnTick: (payload: number) => addPulseOnTick(payload),
+  removePulseOnTick: (payload: number) => removePulseOnTick(payload),
+  setPulseOnTick: (payload: [idx: number, value: string, pulseIdx: number]) =>
+    setPulseOnTick(payload),
+  setPulseOnTickQuickness: (
+    payload: [idx: number, value: string, pulseIdx: number]
+  ) => setPulseOnTickQuickness(payload),
+  addChildSkillKey: (payload: number) => addChildSkillKey(payload),
+  removeChildSkillKey: (payload: number) => removeChildSkillKey(payload),
+  setChildBaseClass: (
+    payload: [idx: number, value: BaseClass, childIdx: number]
+  ) => setChildBaseClass(payload),
+  setChildSkillName: (
+    payload: [idx: number, value: string, childIdx: number]
+  ) => setChildSkillName(payload),
+  addTag: (payload: number) => addTag(payload),
+  removeTag: (payload: number) => removeTag(payload),
+  setTag: (payload: [idx: number, value: SkillTag, tagIdx: number]) =>
+    setTag(payload),
   setAttributeModifier: (payload: {
     idx: number;
     value: string;
@@ -60,6 +95,12 @@ const mapDispatchToProps = {
   }) => setAttributeModifier(payload),
   setDamageModifier: (payload: { idx: number; value: string; field: string }) =>
     setDamageModifier(payload),
+  setEquipBundleName: (payload: SkillPayload<string>) =>
+    setEquipBundleName(payload),
+  setAmmo: (payload: SkillPayload<string>) => setAmmo(payload),
+  setRechargeDuration: (payload: SkillPayload<string>) =>
+    setRechargeDuration(payload),
+  setNumTargets: (payload: SkillPayload<string>) => setNumTargets(payload),
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -84,6 +125,12 @@ const updateSelectGenerator =
   (_: React.SyntheticEvent<Element, Event>, value: T) =>
     dispatcher({ idx, value });
 
+const updateSelectIndexGenerator =
+  (idx: number) =>
+  <T,>(dispatcher: Dispatch<[number, T, number]>, extraIdx: number) =>
+  (_: React.SyntheticEvent<Element, Event>, value: T) =>
+    dispatcher([idx, value, extraIdx]);
+
 const updateToggleGenerator =
   (idx: number) =>
   (dispatcher: Dispatch<SkillPayload<boolean>>) =>
@@ -94,7 +141,7 @@ export const SkillContainer: React.FC<Props> = (props: Props) => {
   const {
     idx,
     skill,
-    skill: { strikeOnTickList },
+    skill: { strikeOnTickList, pulseOnTickList, childSkillKeys, tags },
     setBaseClass,
     setSkillName,
     setIsChildSkill,
@@ -109,14 +156,30 @@ export const SkillContainer: React.FC<Props> = (props: Props) => {
     removeStrikeOnTick,
     setStrikeOnTick,
     setStrikeOnTickQuickness,
+    addPulseOnTick,
+    removePulseOnTick,
+    setPulseOnTick,
+    setPulseOnTickQuickness,
+    addChildSkillKey,
+    removeChildSkillKey,
+    setChildBaseClass,
+    setChildSkillName,
+    addTag,
+    removeTag,
+    setTag,
     setAttributeModifier,
     setDamageModifier,
+    setEquipBundleName,
+    setAmmo,
+    setRechargeDuration,
+    setNumTargets,
   } = props;
 
   const updateText = updateTextGenerator(idx);
   const updateSelect = updateSelectGenerator(idx);
   const updateToggle = updateToggleGenerator(idx);
   const updateTextIndex = updateTextIndexGenerator(idx);
+  const updateSelectIndex = updateSelectIndexGenerator(idx);
 
   const containerFunctions = {
     updateBaseClass: updateSelect<BaseClass>(setBaseClass),
@@ -137,6 +200,27 @@ export const SkillContainer: React.FC<Props> = (props: Props) => {
     updateStrikeOnTicksQuickness: strikeOnTickList[1].map((_, strikeIdx) =>
       updateTextIndex(setStrikeOnTickQuickness, strikeIdx)
     ),
+    addPulseOnTick: () => addPulseOnTick(idx),
+    removePulseOnTick: () => removePulseOnTick(idx),
+    updatePulseOnTicks: pulseOnTickList[0].map((_, pulseIdx) =>
+      updateTextIndex(setPulseOnTick, pulseIdx)
+    ),
+    updatePulseOnTicksQuickness: pulseOnTickList[1].map((_, pulseIdx) =>
+      updateTextIndex(setPulseOnTickQuickness, pulseIdx)
+    ),
+    addChildSkillKey: () => addChildSkillKey(idx),
+    removeChildSkillKey: () => removeChildSkillKey(idx),
+    updateChildBaseClass: childSkillKeys.map((_, childIdx) =>
+      updateSelectIndex(setChildBaseClass, childIdx)
+    ),
+    updateChildSkillName: childSkillKeys.map((_, childIdx) =>
+      updateTextIndex(setChildSkillName, childIdx)
+    ),
+    addTag: () => addTag(idx),
+    removeTag: () => removeTag(idx),
+    updateTags: tags.map((_, tagIdx) =>
+      updateSelectIndex<SkillTag>(setTag, tagIdx)
+    ),
     updateAttributeModifier: (e: React.ChangeEvent<HTMLInputElement>) =>
       setAttributeModifier({
         idx,
@@ -149,6 +233,10 @@ export const SkillContainer: React.FC<Props> = (props: Props) => {
         value: e.currentTarget.value,
         field: e.currentTarget.name,
       }),
+    updateEquipBundleName: updateText(setEquipBundleName),
+    updateAmmo: updateText(setAmmo),
+    updateRechargeDuration: updateText(setRechargeDuration),
+    updateNumTargets: updateText(setNumTargets),
   };
 
   const containerProps = {

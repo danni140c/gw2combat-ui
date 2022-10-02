@@ -19,7 +19,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { upperFirst } from 'lodash';
-import { initialSkillState, SkillType } from '../../store/Skills';
+import { initialSkillState, SkillTag, SkillType } from '../../store/Skills';
 
 type TextUpdater = React.ChangeEventHandler<HTMLInputElement>;
 type SelectUpdater<T> = (
@@ -47,8 +47,23 @@ type Props = {
   removeStrikeOnTick: () => void;
   updateStrikeOnTicks: TextUpdater[];
   updateStrikeOnTicksQuickness: TextUpdater[];
+  addPulseOnTick: () => void;
+  removePulseOnTick: () => void;
+  updatePulseOnTicks: TextUpdater[];
+  updatePulseOnTicksQuickness: TextUpdater[];
+  addChildSkillKey: () => void;
+  removeChildSkillKey: () => void;
+  updateChildBaseClass: SelectUpdater<BaseClass>[];
+  updateChildSkillName: TextUpdater[];
+  addTag: () => void;
+  removeTag: () => void;
+  updateTags: SelectUpdater<SkillTag>[];
   updateAttributeModifier: TextUpdater;
   updateDamageModifier: TextUpdater;
+  updateEquipBundleName: TextUpdater;
+  updateAmmo: TextUpdater;
+  updateRechargeDuration: TextUpdater;
+  updateNumTargets: TextUpdater;
 };
 
 export const Skill: React.FC<Props> = (props: Props) => {
@@ -59,8 +74,14 @@ export const Skill: React.FC<Props> = (props: Props) => {
       castDuration: [castDuration, castDurationQuickness],
       cooldown: [cooldown, cooldownAlacrity],
       strikeOnTickList,
+      pulseOnTickList,
+      childSkillKeys,
+      tags,
       attributeModifiers,
       damageModifiers,
+      ammo,
+      rechargeDuration,
+      numTargets,
     },
     updateBaseClass,
     updateSkillKeyName,
@@ -76,8 +97,23 @@ export const Skill: React.FC<Props> = (props: Props) => {
     removeStrikeOnTick,
     updateStrikeOnTicks,
     updateStrikeOnTicksQuickness,
+    addPulseOnTick,
+    removePulseOnTick,
+    updatePulseOnTicks,
+    updatePulseOnTicksQuickness,
+    addChildSkillKey,
+    removeChildSkillKey,
+    updateChildBaseClass,
+    updateChildSkillName,
+    addTag,
+    removeTag,
+    updateTags,
     updateAttributeModifier,
     updateDamageModifier,
+    updateEquipBundleName,
+    updateAmmo,
+    updateRechargeDuration,
+    updateNumTargets,
   } = props;
 
   return (
@@ -129,7 +165,7 @@ export const Skill: React.FC<Props> = (props: Props) => {
       )}
       <Grid item xs={12}>
         {renderAccordion(
-          true,
+          false,
           'Strike on ticks',
           <>
             <Grid item xs={12}>
@@ -176,12 +212,153 @@ export const Skill: React.FC<Props> = (props: Props) => {
         )}
       </Grid>
       <Grid item xs={12}>
+        {renderAccordion(
+          false,
+          'Pulse on ticks',
+          <>
+            <Grid item xs={12}>
+              <Box sx={{ '& > :not(style)': { m: 1 } }}>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: green[500],
+                    '&:hover': {
+                      bgcolor: green[600],
+                    },
+                  }}
+                  onClick={addPulseOnTick}
+                >
+                  <AddIcon />
+                </Fab>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: red[500],
+                    '&:hover': { bgcolor: red[600] },
+                  }}
+                  onClick={removePulseOnTick}
+                >
+                  <RemoveIcon />
+                </Fab>
+              </Box>
+            </Grid>
+            {pulseOnTickList[0].map((tick, idx) =>
+              renderTextField(
+                `Integer - Current value: ${tick}`,
+                updatePulseOnTicks[idx],
+                `Index ${idx} without quickness`
+              )
+            )}
+            {pulseOnTickList[1].map((tick, idx) =>
+              renderTextField(
+                `Integer - Current value: ${tick}`,
+                updatePulseOnTicksQuickness[idx],
+                `Index ${idx} with quickness`
+              )
+            )}
+          </>
+        )}
+      </Grid>
+      <Grid item xs={12}>
+        {renderAccordion(
+          false,
+          'Child skills',
+          <>
+            <Grid item xs={12}>
+              <Box sx={{ '& > :not(style)': { m: 1 } }}>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: green[500],
+                    '&:hover': {
+                      bgcolor: green[600],
+                    },
+                  }}
+                  onClick={addChildSkillKey}
+                >
+                  <AddIcon />
+                </Fab>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: red[500],
+                    '&:hover': { bgcolor: red[600] },
+                  }}
+                  onClick={removeChildSkillKey}
+                >
+                  <RemoveIcon />
+                </Fab>
+              </Box>
+            </Grid>
+            {childSkillKeys.map((_, idx) => (
+              <>
+                {renderSelectField(
+                  BaseClass,
+                  updateChildBaseClass[idx],
+                  `Index ${idx} base class`,
+                  BaseClass.INVALID
+                )}
+                {renderTextField(
+                  'String',
+                  updateChildSkillName[idx],
+                  `Index ${idx} skill name`
+                )}
+              </>
+            ))}
+          </>
+        )}
+      </Grid>
+      <Grid item xs={12}>
+        {renderAccordion(
+          false,
+          'Tags',
+          <>
+            <Grid item xs={12}>
+              <Box sx={{ '& > :not(style)': { m: 1 } }}>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: green[500],
+                    '&:hover': {
+                      bgcolor: green[600],
+                    },
+                  }}
+                  onClick={addTag}
+                >
+                  <AddIcon />
+                </Fab>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: red[500],
+                    '&:hover': { bgcolor: red[600] },
+                  }}
+                  onClick={removeTag}
+                >
+                  <RemoveIcon />
+                </Fab>
+              </Box>
+            </Grid>
+            {tags.map((_, idx) =>
+              renderSelectField(
+                SkillTag,
+                updateTags[idx],
+                'Tag',
+                SkillTag.INVALID
+              )
+            )}
+          </>
+        )}
+      </Grid>
+      <Grid item xs={12}>
         {renderModifiers(
           'Attribute modifiers',
           initialSkillState.attributeModifiers,
           updateAttributeModifier,
           attributeModifiers
         )}
+      </Grid>
+      <Grid item xs={12}>
         {renderModifiers(
           'Damage modifiers',
           initialSkillState.damageModifiers,
@@ -189,6 +366,18 @@ export const Skill: React.FC<Props> = (props: Props) => {
           damageModifiers
         )}
       </Grid>
+      {renderTextField('String', updateEquipBundleName, 'Equip bundle name')}
+      {renderTextField(`Integer - Current value: ${ammo}`, updateAmmo, 'Ammo')}
+      {renderTextField(
+        `Integer - Current value: ${rechargeDuration}`,
+        updateRechargeDuration,
+        'Recharge duration (ms)'
+      )}
+      {renderTextField(
+        `Integer - Current value: ${numTargets}`,
+        updateNumTargets,
+        'Numer of targets'
+      )}
     </Grid>
   );
 };

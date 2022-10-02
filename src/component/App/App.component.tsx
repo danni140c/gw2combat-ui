@@ -90,25 +90,24 @@ const App: React.FC<Props> = (props: Props) => {
       {/* </Container> */}
       <Container sx={{ marginTop: '48px' }} maxWidth='xl'>
         <TabPanel value={tab} index={0}>
-          {/* <Box */}
-          {/*   sx={{ */}
-          {/*     paddingTop: 3, */}
-          {/*     paddingBottom: 5, */}
-          {/*   }} */}
-          {/* > */}
-          {/*   <Grid container spacing={4}> */}
-          {/*     <Grid item xs={12}> */}
-          {/*       <TextField */}
-          {/*         fullWidth */}
-          {/*         label={'Seach'} */}
-          {/*         helperText={'Filter skills'} */}
-          {/*         onChange={updateSearch} */}
-          {/*       /> */}
-          {/*     </Grid> */}
-          {/*   </Grid> */}
-          {/* </Box> */}
-          {/* <Skill onUpdate={onUpdate} /> */}
-          <Box>{renderSkills(skills)}</Box>
+          <Box
+            sx={{
+              paddingTop: 3,
+              paddingBottom: 5,
+            }}
+          >
+            <Grid container spacing={4}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label={'Seach'}
+                  helperText={'Filter skills'}
+                  onChange={updateSearch}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+          <Box>{renderSkills(skills, skillSearchMatches)}</Box>
           <div onClick={addSkill}>Add</div>
           <div onClick={removeSkill}>Remove</div>
         </TabPanel>
@@ -123,9 +122,20 @@ const App: React.FC<Props> = (props: Props) => {
   );
 };
 
-const renderSkills = (skills: SkillType[]) => {
+const renderSkills = (
+  skills: SkillType[],
+  skillSearchMatches: number[] | undefined
+) => {
   return skills.map((skill, i: number) => (
-    <Box key={i}>
+    <Box
+      key={i}
+      sx={{
+        display:
+          skillSearchMatches && skillSearchMatches.includes(i)
+            ? 'inherit'
+            : 'none',
+      }}
+    >
       <Skill skill={skill} idx={i} />
     </Box>
   ));
