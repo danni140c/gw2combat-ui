@@ -1,18 +1,33 @@
 import React from 'react';
 import Skill from '../Skill';
 import JsonOutput from '../JsonOutput';
-import { Box, Container, IconButton, Paper, Tab, Tabs } from '@mui/material';
-import { SkillType } from '../Skill/Skill.config';
+import {
+  Box,
+  Container,
+  Grid,
+  IconButton,
+  Paper,
+  Tab,
+  Tabs,
+  TextField,
+} from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { SkillType } from '../../store/Skills/Skills';
 
 type Props = {
   tab: number;
   updateTab: any;
-  onUpdate: (skill: SkillType) => void;
+  onUpdate?: (skill: SkillType) => void;
   toggleColorMode: () => void;
-  json: string;
+  jsonInput: any;
   mode: 'dark' | 'light';
+  skills: SkillType[];
+  addSkill: () => void;
+  removeSkill: () => void;
+  onSkillUpdate?: (skill: SkillType, idx: number) => void;
+  updateSearch?: any;
+  skillSearchMatches?: number[];
 };
 
 type TabPanelProps = {
@@ -32,12 +47,29 @@ export const TabPanel: React.FC<TabPanelProps> = (props: TabPanelProps) => {
 };
 
 const App: React.FC<Props> = (props: Props) => {
-  const { tab, updateTab, onUpdate, toggleColorMode, json, mode } = props;
+  const {
+    tab,
+    updateTab,
+    toggleColorMode,
+    jsonInput,
+    mode,
+    skills,
+    addSkill,
+    removeSkill,
+    updateSearch,
+    skillSearchMatches,
+  } = props;
 
   return (
     <Box sx={{ pb: 7 }}>
       <Paper
-        sx={{ position: 'fixed', top: 0, left: 0, right: 0 }}
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 10,
+        }}
         elevation={3}
       >
         <Tabs value={tab} onChange={updateTab} centered>
@@ -54,16 +86,49 @@ const App: React.FC<Props> = (props: Props) => {
           {renderBrightnessIcon(mode)}
         </IconButton>
       </Paper>
+      {/* <Container sx={{ marginTop: '48px' }} maxWidth='xl'> */}
+      {/* </Container> */}
       <Container sx={{ marginTop: '48px' }} maxWidth='xl'>
         <TabPanel value={tab} index={0}>
-          <Skill onUpdate={onUpdate} />
+          {/* <Box */}
+          {/*   sx={{ */}
+          {/*     paddingTop: 3, */}
+          {/*     paddingBottom: 5, */}
+          {/*   }} */}
+          {/* > */}
+          {/*   <Grid container spacing={4}> */}
+          {/*     <Grid item xs={12}> */}
+          {/*       <TextField */}
+          {/*         fullWidth */}
+          {/*         label={'Seach'} */}
+          {/*         helperText={'Filter skills'} */}
+          {/*         onChange={updateSearch} */}
+          {/*       /> */}
+          {/*     </Grid> */}
+          {/*   </Grid> */}
+          {/* </Box> */}
+          {/* <Skill onUpdate={onUpdate} /> */}
+          <Box>{renderSkills(skills)}</Box>
+          <div onClick={addSkill}>Add</div>
+          <div onClick={removeSkill}>Remove</div>
+        </TabPanel>
+        <TabPanel value={tab} index={1}>
+          Effects
         </TabPanel>
         <TabPanel value={tab} index={2}>
-          <JsonOutput json={json} />
+          <JsonOutput jsonInput={jsonInput} />
         </TabPanel>
       </Container>
     </Box>
   );
+};
+
+const renderSkills = (skills: SkillType[]) => {
+  return skills.map((skill, i: number) => (
+    <Box key={i}>
+      <Skill skill={skill} idx={i} />
+    </Box>
+  ));
 };
 
 const renderBrightnessIcon = (mode: 'light' | 'dark') => {

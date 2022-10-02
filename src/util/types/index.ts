@@ -1,4 +1,4 @@
-export enum Class {
+export enum BaseClass {
   INVALID = 'Invalid',
   UNIVERSAL = 'UNIVERSAL',
   GUARDIAN = 'GUARDIAN',

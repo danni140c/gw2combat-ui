@@ -4,7 +4,8 @@ import './index.css';
 import Theme from './component/Theme';
 import App from './component/App';
 import reportWebVitals from './reportWebVitals';
-import { CssBaseline } from '@mui/material';
+import store from './store';
+import { Provider } from 'react-redux';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,7 +13,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Theme>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </Theme>
   </React.StrictMode>
 );

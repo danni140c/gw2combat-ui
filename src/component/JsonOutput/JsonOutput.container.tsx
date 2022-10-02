@@ -2,7 +2,7 @@ import React from 'react';
 import JsonOutput from './JsonOutput.component';
 
 type Props = {
-  json: string;
+  jsonInput: any;
 };
 
 const downloadJson =
@@ -20,7 +20,8 @@ const downloadJson =
   };
 
 export const JsonOutputContainer: React.FC<Props> = (props: Props) => {
-  const { json } = props;
+  const { jsonInput } = props;
+  const [json, setJson] = React.useState('');
 
   const containerFunctions = {
     downloadJson: downloadJson(json),
@@ -29,6 +30,16 @@ export const JsonOutputContainer: React.FC<Props> = (props: Props) => {
   const containerProps = {
     json,
   };
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      setJson(JSON.stringify(jsonInput, null, 2));
+    }, 1500);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [jsonInput]);
 
   return <JsonOutput {...containerProps} {...containerFunctions} />;
 };

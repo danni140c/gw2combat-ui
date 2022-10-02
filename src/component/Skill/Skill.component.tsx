@@ -1,6 +1,5 @@
 import React from 'react';
-import { initialSkillState, SkillType } from './Skill.config';
-import { Class, WeaponType, WeaponPosition } from '../../util/types';
+import { BaseClass, WeaponType, WeaponPosition } from '../../util/types';
 import {
   TextField,
   Grid,
@@ -9,53 +8,83 @@ import {
   Typography,
   AccordionDetails,
   Autocomplete,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+  Fab,
+  Box,
 } from '@mui/material';
+import { green, red } from '@mui/material/colors';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { upperFirst } from 'lodash';
+import { initialSkillState, SkillType } from '../../store/Skills';
+
+type TextUpdater = React.ChangeEventHandler<HTMLInputElement>;
+type SelectUpdater<T> = (
+  e: React.SyntheticEvent<Element, Event>,
+  value: T
+) => void;
+type ToggleUpdater = (
+  e: React.SyntheticEvent<Element, Event>,
+  value: boolean
+) => void;
 
 type Props = {
   skill: SkillType;
-  updateBaseClass: (
-    e: React.SyntheticEvent<Element, Event>,
-    value: any
-  ) => void;
-  updateSkillKeyName: React.ChangeEventHandler<HTMLInputElement>;
-  updateWeaponType: (
-    e: React.SyntheticEvent<Element, Event>,
-    value: any
-  ) => void;
-  updateWeaponPosition: (
-    e: React.SyntheticEvent<Element, Event>,
-    value: any
-  ) => void;
-  updateDamageCoefficient: React.ChangeEventHandler<HTMLInputElement>;
-  updateCastDurationNoQuick: React.ChangeEventHandler<HTMLInputElement>;
-  updateAttributeModifier: React.ChangeEventHandler<HTMLInputElement>;
-  updateDamageModifier: React.ChangeEventHandler<HTMLInputElement>;
+  updateBaseClass: SelectUpdater<BaseClass>;
+  updateSkillKeyName: TextUpdater;
+  updateIsChildSkill: ToggleUpdater;
+  updateWeaponType: SelectUpdater<WeaponType>;
+  updateWeaponPosition: SelectUpdater<WeaponPosition>;
+  updateDamageCoefficient: TextUpdater;
+  updateCastDuration: TextUpdater;
+  updateCastDurationQuickness: TextUpdater;
+  updateCooldown: TextUpdater;
+  updateCooldownAlacrity: TextUpdater;
+  addStrikeOnTick: () => void;
+  removeStrikeOnTick: () => void;
+  updateStrikeOnTicks: TextUpdater[];
+  updateStrikeOnTicksQuickness: TextUpdater[];
+  updateAttributeModifier: TextUpdater;
+  updateDamageModifier: TextUpdater;
 };
 
 export const Skill: React.FC<Props> = (props: Props) => {
   const {
     skill: {
+      isChildSkill,
       damageCoefficient,
-      castDuration: [castDurationNoQuick],
+      castDuration: [castDuration, castDurationQuickness],
+      cooldown: [cooldown, cooldownAlacrity],
+      strikeOnTickList,
       attributeModifiers,
       damageModifiers,
     },
     updateBaseClass,
     updateSkillKeyName,
+    updateIsChildSkill,
     updateWeaponType,
     updateWeaponPosition,
     updateDamageCoefficient,
-    updateCastDurationNoQuick,
+    updateCastDuration,
+    updateCastDurationQuickness,
+    updateCooldown,
+    updateCooldownAlacrity,
+    addStrikeOnTick,
+    removeStrikeOnTick,
+    updateStrikeOnTicks,
+    updateStrikeOnTicksQuickness,
     updateAttributeModifier,
     updateDamageModifier,
   } = props;
 
   return (
     <Grid container spacing={4}>
+      {renderToggleField(updateIsChildSkill, 'Is child skill', isChildSkill)}
       {renderSelectField(
-        Class,
+        BaseClass,
         updateBaseClass,
         'Base class',
         initialSkillState.skillKey.baseClass
@@ -79,10 +108,73 @@ export const Skill: React.FC<Props> = (props: Props) => {
         'Damage coefficient'
       )}
       {renderTextField(
-        `Integer - Current value: ${castDurationNoQuick}`,
-        updateCastDurationNoQuick,
+        `Integer - Current value: ${castDuration}`,
+        updateCastDuration,
         'Cast duration without quickness (ms)'
       )}
+      {renderTextField(
+        `Integer - Current value: ${castDurationQuickness}`,
+        updateCastDurationQuickness,
+        'Cast duration with quickness (ms)'
+      )}
+      {renderTextField(
+        `Integer - Current value: ${cooldown}`,
+        updateCooldown,
+        'Cooldown without alacrity (ms)'
+      )}
+      {renderTextField(
+        `Integer - Current value: ${cooldownAlacrity}`,
+        updateCooldownAlacrity,
+        'Cooldown with alacrity (ms)'
+      )}
+      <Grid item xs={12}>
+        {renderAccordion(
+          true,
+          'Strike on ticks',
+          <>
+            <Grid item xs={12}>
+              <Box sx={{ '& > :not(style)': { m: 1 } }}>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: green[500],
+                    '&:hover': {
+                      bgcolor: green[600],
+                    },
+                  }}
+                  onClick={addStrikeOnTick}
+                >
+                  <AddIcon />
+                </Fab>
+                <Fab
+                  sx={{
+                    color: 'common.white',
+                    bgcolor: red[500],
+                    '&:hover': { bgcolor: red[600] },
+                  }}
+                  onClick={removeStrikeOnTick}
+                >
+                  <RemoveIcon />
+                </Fab>
+              </Box>
+            </Grid>
+            {strikeOnTickList[0].map((tick, idx) =>
+              renderTextField(
+                `Integer - Current value: ${tick}`,
+                updateStrikeOnTicks[idx],
+                `Index ${idx} without quickness`
+              )
+            )}
+            {strikeOnTickList[1].map((tick, idx) =>
+              renderTextField(
+                `Integer - Current value: ${tick}`,
+                updateStrikeOnTicksQuickness[idx],
+                `Index ${idx} with quickness`
+              )
+            )}
+          </>
+        )}
+      </Grid>
       <Grid item xs={12}>
         {renderModifiers(
           'Attribute modifiers',
@@ -103,7 +195,7 @@ export const Skill: React.FC<Props> = (props: Props) => {
 
 const renderSelectField = (
   options: object,
-  update: (e: React.SyntheticEvent<Element, Event>, value: any) => void,
+  update: SelectUpdater<any>,
   label: string,
   defaultValue: string
 ) => (
@@ -124,7 +216,7 @@ const renderSelectField = (
 
 const renderTextField = (
   helperText: string,
-  update: React.ChangeEventHandler<HTMLInputElement>,
+  update: TextUpdater,
   label: string
 ) => (
   <Grid item xs={12} sm={6} md={4}>
@@ -137,35 +229,62 @@ const renderTextField = (
   </Grid>
 );
 
+const renderToggleField = (
+  update: ToggleUpdater,
+  label: string,
+  defaultValue: boolean
+) => (
+  <Grid item xs={12}>
+    <FormGroup>
+      <FormControlLabel
+        onChange={update}
+        control={<Switch defaultChecked={defaultValue} />}
+        label={label}
+      />
+    </FormGroup>
+  </Grid>
+);
+
 const renderModifiers = (
   title: string,
   modifiers: object,
-  updateModifier: React.ChangeEventHandler<HTMLInputElement>,
+  updateModifier: TextUpdater,
   currentModifiers: { [key: string]: number | undefined }
+) =>
+  renderAccordion(
+    false,
+    title,
+    Object.keys(modifiers).map((modifier) => (
+      <Grid key={modifier} item xs={12} sm={6} md={4}>
+        <TextField
+          fullWidth
+          label={upperFirst(
+            modifier
+              .replace(/([A-Z])/g, ' $1')
+              .toLowerCase()
+              .replace(/pct/g, 'percent')
+          )}
+          /* defaultValue={initialValue} */
+          inputProps={{ name: modifier }}
+          helperText={`Float - Current value: ${currentModifiers[modifier]}`}
+          onChange={updateModifier}
+        />
+      </Grid>
+    ))
+  );
+
+const renderAccordion = (
+  expanded: boolean,
+  title: string,
+  children: React.ReactNode
 ) => (
-  <Accordion>
+  <Accordion defaultExpanded={expanded}>
     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
       <Typography>{title}</Typography>
     </AccordionSummary>
     <AccordionDetails>
       <Grid container spacing={4}>
-        {Object.keys(modifiers).map((modifier) => (
-          <Grid key={modifier} item xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              label={upperFirst(
-                modifier
-                  .replace(/([A-Z])/g, ' $1')
-                  .toLowerCase()
-                  .replace(/pct/g, 'percent')
-              )}
-              /* defaultValue={initialValue} */
-              inputProps={{ name: modifier }}
-              helperText={`Float - Current value: ${currentModifiers[modifier]}`}
-              onChange={updateModifier}
-            />
-          </Grid>
-        ))}
+        {children}
       </Grid>
     </AccordionDetails>
   </Accordion>
