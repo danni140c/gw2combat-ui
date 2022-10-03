@@ -1,25 +1,23 @@
 import React from 'react';
-import { BaseClass, WeaponType, WeaponPosition } from '../../util/types';
 import {
-  TextField,
-  Grid,
-  Accordion,
-  AccordionSummary,
-  Typography,
-  AccordionDetails,
-  Autocomplete,
-  FormGroup,
-  FormControlLabel,
-  Switch,
-  Fab,
-  Box,
-} from '@mui/material';
-import { green, red } from '@mui/material/colors';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import { upperFirst } from 'lodash';
-import { initialSkillState, SkillTag, SkillType } from '../../store/Skills';
+  BaseClass,
+  WeaponType,
+  WeaponPosition,
+  Effect,
+} from '../../util/types';
+import { Grid } from '@mui/material';
+import {
+  initialSkillState,
+  SkillTag,
+  SkillType,
+  Direction,
+} from '../../store/Skills';
+import GridTextField from '../GridTextField';
+import GridSelectField from '../GridSelectField';
+import GridToggleField from '../GridToggleField';
+import GridAddRemoveButtons from '../GridAddRemoveButtons';
+import GridAccordion from '../GridAccordion';
+import GridModifiers from '../GridModifiers';
 
 type TextUpdater = React.ChangeEventHandler<HTMLInputElement>;
 type SelectUpdater<T> = (
@@ -33,6 +31,7 @@ type ToggleUpdater = (
 
 type Props = {
   skill: SkillType;
+  defaultSkill: SkillType;
   updateBaseClass: SelectUpdater<BaseClass>;
   updateSkillKeyName: TextUpdater;
   updateIsChildSkill: ToggleUpdater;
@@ -51,6 +50,22 @@ type Props = {
   removePulseOnTick: () => void;
   updatePulseOnTicks: TextUpdater[];
   updatePulseOnTicksQuickness: TextUpdater[];
+  addStrikeEffectApplication: () => void;
+  removeStrikeEffectApplication: () => void;
+  updateStrikeEffectUniqueEffectTypeName: TextUpdater[];
+  updateStrikeEffectType: SelectUpdater<Effect>[];
+  updateStrikeEffectDirection: SelectUpdater<Direction>[];
+  updateStrikeEffectBaseDuration: TextUpdater[];
+  updateStrikeEffectNumStacks: TextUpdater[];
+  updateStrikeEffectNumTargets: TextUpdater[];
+  addPulseEffectApplication: () => void;
+  removePulseEffectApplication: () => void;
+  updatePulseEffectUniqueEffectTypeName: TextUpdater[];
+  updatePulseEffectType: SelectUpdater<Effect>[];
+  updatePulseEffectDirection: SelectUpdater<Direction>[];
+  updatePulseEffectBaseDuration: TextUpdater[];
+  updatePulseEffectNumStacks: TextUpdater[];
+  updatePulseEffectNumTargets: TextUpdater[];
   addChildSkillKey: () => void;
   removeChildSkillKey: () => void;
   updateChildBaseClass: SelectUpdater<BaseClass>[];
@@ -69,12 +84,13 @@ type Props = {
 export const Skill: React.FC<Props> = (props: Props) => {
   const {
     skill: {
-      isChildSkill,
       damageCoefficient,
       castDuration: [castDuration, castDurationQuickness],
       cooldown: [cooldown, cooldownAlacrity],
       strikeOnTickList,
       pulseOnTickList,
+      onStrikeEffectApplication,
+      onPulseEffectApplication,
       childSkillKeys,
       tags,
       attributeModifiers,
@@ -83,6 +99,7 @@ export const Skill: React.FC<Props> = (props: Props) => {
       rechargeDuration,
       numTargets,
     },
+    defaultSkill,
     updateBaseClass,
     updateSkillKeyName,
     updateIsChildSkill,
@@ -101,6 +118,22 @@ export const Skill: React.FC<Props> = (props: Props) => {
     removePulseOnTick,
     updatePulseOnTicks,
     updatePulseOnTicksQuickness,
+    addStrikeEffectApplication,
+    removeStrikeEffectApplication,
+    updateStrikeEffectUniqueEffectTypeName,
+    updateStrikeEffectType,
+    updateStrikeEffectDirection,
+    updateStrikeEffectBaseDuration,
+    updateStrikeEffectNumStacks,
+    updateStrikeEffectNumTargets,
+    addPulseEffectApplication,
+    removePulseEffectApplication,
+    updatePulseEffectUniqueEffectTypeName,
+    updatePulseEffectType,
+    updatePulseEffectDirection,
+    updatePulseEffectBaseDuration,
+    updatePulseEffectNumStacks,
+    updatePulseEffectNumTargets,
     addChildSkillKey,
     removeChildSkillKey,
     updateChildBaseClass,
@@ -118,365 +151,209 @@ export const Skill: React.FC<Props> = (props: Props) => {
 
   return (
     <Grid container spacing={4}>
-      {renderToggleField(updateIsChildSkill, 'Is child skill', isChildSkill)}
-      {renderSelectField(
-        BaseClass,
-        updateBaseClass,
-        'Base class',
-        initialSkillState.skillKey.baseClass
-      )}
-      {renderTextField('String', updateSkillKeyName, 'Skill name')}
-      {renderSelectField(
-        WeaponType,
-        updateWeaponType,
-        'Weapon type',
-        initialSkillState.weaponType
-      )}
-      {renderSelectField(
-        WeaponPosition,
-        updateWeaponPosition,
-        'Weapon position',
-        initialSkillState.weaponPosition
-      )}
-      {renderTextField(
-        `Float - Current value: ${damageCoefficient}`,
-        updateDamageCoefficient,
-        'Damage coefficient'
-      )}
-      {renderTextField(
-        `Integer - Current value: ${castDuration}`,
-        updateCastDuration,
-        'Cast duration without quickness (ms)'
-      )}
-      {renderTextField(
-        `Integer - Current value: ${castDurationQuickness}`,
-        updateCastDurationQuickness,
-        'Cast duration with quickness (ms)'
-      )}
-      {renderTextField(
-        `Integer - Current value: ${cooldown}`,
-        updateCooldown,
-        'Cooldown without alacrity (ms)'
-      )}
-      {renderTextField(
-        `Integer - Current value: ${cooldownAlacrity}`,
-        updateCooldownAlacrity,
-        'Cooldown with alacrity (ms)'
-      )}
-      <Grid item xs={12}>
-        {renderAccordion(
-          false,
-          'Strike on ticks',
-          <>
-            <Grid item xs={12}>
-              <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: green[500],
-                    '&:hover': {
-                      bgcolor: green[600],
-                    },
-                  }}
-                  onClick={addStrikeOnTick}
-                >
-                  <AddIcon />
-                </Fab>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: red[500],
-                    '&:hover': { bgcolor: red[600] },
-                  }}
-                  onClick={removeStrikeOnTick}
-                >
-                  <RemoveIcon />
-                </Fab>
-              </Box>
-            </Grid>
-            {strikeOnTickList[0].map((tick, idx) =>
-              renderTextField(
-                `Integer - Current value: ${tick}`,
-                updateStrikeOnTicks[idx],
-                `Index ${idx} without quickness`
-              )
-            )}
-            {strikeOnTickList[1].map((tick, idx) =>
-              renderTextField(
-                `Integer - Current value: ${tick}`,
-                updateStrikeOnTicksQuickness[idx],
-                `Index ${idx} with quickness`
-              )
-            )}
-          </>
-        )}
-      </Grid>
-      <Grid item xs={12}>
-        {renderAccordion(
-          false,
-          'Pulse on ticks',
-          <>
-            <Grid item xs={12}>
-              <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: green[500],
-                    '&:hover': {
-                      bgcolor: green[600],
-                    },
-                  }}
-                  onClick={addPulseOnTick}
-                >
-                  <AddIcon />
-                </Fab>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: red[500],
-                    '&:hover': { bgcolor: red[600] },
-                  }}
-                  onClick={removePulseOnTick}
-                >
-                  <RemoveIcon />
-                </Fab>
-              </Box>
-            </Grid>
-            {pulseOnTickList[0].map((tick, idx) =>
-              renderTextField(
-                `Integer - Current value: ${tick}`,
-                updatePulseOnTicks[idx],
-                `Index ${idx} without quickness`
-              )
-            )}
-            {pulseOnTickList[1].map((tick, idx) =>
-              renderTextField(
-                `Integer - Current value: ${tick}`,
-                updatePulseOnTicksQuickness[idx],
-                `Index ${idx} with quickness`
-              )
-            )}
-          </>
-        )}
-      </Grid>
-      <Grid item xs={12}>
-        {renderAccordion(
-          false,
-          'Child skills',
-          <>
-            <Grid item xs={12}>
-              <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: green[500],
-                    '&:hover': {
-                      bgcolor: green[600],
-                    },
-                  }}
-                  onClick={addChildSkillKey}
-                >
-                  <AddIcon />
-                </Fab>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: red[500],
-                    '&:hover': { bgcolor: red[600] },
-                  }}
-                  onClick={removeChildSkillKey}
-                >
-                  <RemoveIcon />
-                </Fab>
-              </Box>
-            </Grid>
-            {childSkillKeys.map((_, idx) => (
-              <>
-                {renderSelectField(
-                  BaseClass,
-                  updateChildBaseClass[idx],
-                  `Index ${idx} base class`,
-                  BaseClass.INVALID
-                )}
-                {renderTextField(
-                  'String',
-                  updateChildSkillName[idx],
-                  `Index ${idx} skill name`
-                )}
-              </>
-            ))}
-          </>
-        )}
-      </Grid>
-      <Grid item xs={12}>
-        {renderAccordion(
-          false,
-          'Tags',
-          <>
-            <Grid item xs={12}>
-              <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: green[500],
-                    '&:hover': {
-                      bgcolor: green[600],
-                    },
-                  }}
-                  onClick={addTag}
-                >
-                  <AddIcon />
-                </Fab>
-                <Fab
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: red[500],
-                    '&:hover': { bgcolor: red[600] },
-                  }}
-                  onClick={removeTag}
-                >
-                  <RemoveIcon />
-                </Fab>
-              </Box>
-            </Grid>
-            {tags.map((_, idx) =>
-              renderSelectField(
-                SkillTag,
-                updateTags[idx],
-                'Tag',
-                SkillTag.INVALID
-              )
-            )}
-          </>
-        )}
-      </Grid>
-      <Grid item xs={12}>
-        {renderModifiers(
-          'Attribute modifiers',
-          initialSkillState.attributeModifiers,
-          updateAttributeModifier,
-          attributeModifiers
-        )}
-      </Grid>
-      <Grid item xs={12}>
-        {renderModifiers(
-          'Damage modifiers',
-          initialSkillState.damageModifiers,
-          updateDamageModifier,
-          damageModifiers
-        )}
-      </Grid>
-      {renderTextField('String', updateEquipBundleName, 'Equip bundle name')}
-      {renderTextField(`Integer - Current value: ${ammo}`, updateAmmo, 'Ammo')}
-      {renderTextField(
-        `Integer - Current value: ${rechargeDuration}`,
-        updateRechargeDuration,
-        'Recharge duration (ms)'
-      )}
-      {renderTextField(
-        `Integer - Current value: ${numTargets}`,
-        updateNumTargets,
-        'Numer of targets'
-      )}
+      <GridToggleField
+        onChange={updateIsChildSkill}
+        label='Is child skill'
+        defaultValue={defaultSkill.isChildSkill}
+      />
+      <GridSelectField
+        options={BaseClass}
+        onChange={updateBaseClass}
+        label='Base class'
+        defaultValue={defaultSkill.skillKey.baseClass}
+      />
+      <GridTextField
+        helperText='String'
+        onChange={updateSkillKeyName}
+        label='Skill name'
+        defaultValue={defaultSkill.skillKey.name}
+      />
+      <GridSelectField
+        options={WeaponType}
+        onChange={updateWeaponType}
+        label='Weapon type'
+        defaultValue={defaultSkill.weaponType}
+      />
+      <GridSelectField
+        options={WeaponPosition}
+        onChange={updateWeaponPosition}
+        label='Weapon position'
+        defaultValue={defaultSkill.weaponPosition}
+      />
+      <GridTextField
+        helperText={`Float - Current value: ${damageCoefficient}`}
+        onChange={updateDamageCoefficient}
+        label='Damage coefficient'
+        defaultValue={defaultSkill.damageCoefficient}
+      />
+      <GridTextField
+        helperText={`Integer - Current value: ${castDuration}`}
+        onChange={updateCastDuration}
+        label='Cast duration without quickness (ms)'
+        defaultValue={defaultSkill.castDuration[0]}
+      />
+      <GridTextField
+        helperText={`Integer - Current value: ${castDurationQuickness}`}
+        onChange={updateCastDurationQuickness}
+        label='Cast duration with quickness (ms)'
+        defaultValue={defaultSkill.castDuration[1]}
+      />
+      <GridTextField
+        helperText={`Integer - Current value: ${cooldown}`}
+        onChange={updateCooldown}
+        label='Cooldown without alacrity (ms)'
+        defaultValue={defaultSkill.cooldown[0]}
+      />
+      <GridTextField
+        helperText={`Integer - Current value: ${cooldownAlacrity}`}
+        onChange={updateCooldownAlacrity}
+        label='Cooldown with alacrity (ms)'
+        defaultValue={defaultSkill.cooldown[1]}
+      />
+      <GridAccordion defaultExpanded={false} title='Strike on ticks'>
+        <GridAddRemoveButtons
+          onAdd={addStrikeOnTick}
+          onRemove={removeStrikeOnTick}
+        />
+        {strikeOnTickList[0].map((tick, idx) => (
+          <GridTextField
+            key={`0-${idx}`}
+            helperText={`Integer - Current value: ${tick}`}
+            onChange={updateStrikeOnTicks[idx]}
+            label={`Index ${idx} without quickness`}
+            defaultValue={(defaultSkill.strikeOnTickList[0] || [])[idx]}
+          />
+        ))}
+        {strikeOnTickList[1].map((tick, idx) => (
+          <GridTextField
+            key={`1-${idx}`}
+            helperText={`Integer - Current value: ${tick}`}
+            onChange={updateStrikeOnTicksQuickness[idx]}
+            label={`Index ${idx} with quickness`}
+            defaultValue={(defaultSkill.strikeOnTickList[1] || [])[idx]}
+          />
+        ))}
+      </GridAccordion>
+      <GridAccordion defaultExpanded={false} title='Pulse on ticks'>
+        <GridAddRemoveButtons
+          onAdd={addPulseOnTick}
+          onRemove={removePulseOnTick}
+        />
+        {pulseOnTickList[0].map((tick, idx) => (
+          <GridTextField
+            key={`0-${idx}`}
+            helperText={`Integer - Current value: ${tick}`}
+            onChange={updatePulseOnTicks[idx]}
+            label={`Index ${idx} without quickness`}
+            defaultValue={(defaultSkill.pulseOnTickList[0] || [])[idx]}
+          />
+        ))}
+        {pulseOnTickList[1].map((tick, idx) => (
+          <GridTextField
+            key={`1-${idx}`}
+            helperText={`Integer - Current value: ${tick}`}
+            onChange={updatePulseOnTicksQuickness[idx]}
+            label={`Index ${idx} with quickness`}
+            defaultValue={(defaultSkill.pulseOnTickList[1] || [])[idx]}
+          />
+        ))}
+      </GridAccordion>
+      <GridAccordion
+        defaultExpanded={false}
+        title='On strike effect applications'
+      >
+        <GridAddRemoveButtons onAdd={addStrikeEffectApplication} onRemove={removeStrikeEffectApplication} />
+        {onStrikeEffectApplication.map((_, idx) => (
+          <React.Fragment>
+            <GridTextField
+              helperText='String'
+              onChange={updateStrikeEffectUniqueEffectTypeName[idx]}
+              label={`Index ${idx} effect name`}
+              defaultValue={
+                defaultSkill.onStrikeEffectApplication[idx]?.uniqueEffectType
+                  ?.name
+              }
+            />
+          </React.Fragment>
+        ))}
+      </GridAccordion>
+      <GridAccordion defaultExpanded={false} title='Child skills'>
+        <GridAddRemoveButtons
+          onAdd={addChildSkillKey}
+          onRemove={removeChildSkillKey}
+        />
+        {childSkillKeys.map((_, idx) => (
+          <React.Fragment key={idx}>
+            <GridSelectField
+              options={BaseClass}
+              onChange={updateChildBaseClass[idx]}
+              label={`Index ${idx} base class`}
+              defaultValue={
+                defaultSkill.childSkillKeys[idx]?.baseClass ||
+                initialSkillState.skillKey.baseClass
+              }
+            />
+            <GridTextField
+              helperText='String'
+              onChange={updateChildSkillName[idx]}
+              label={`Index ${idx} skill name`}
+              defaultValue={defaultSkill.childSkillKeys[idx]?.name}
+            />
+          </React.Fragment>
+        ))}
+      </GridAccordion>
+      <GridAccordion defaultExpanded={false} title='Tags'>
+        <GridAddRemoveButtons onAdd={addTag} onRemove={removeTag} />
+        {tags.map((_, idx) => (
+          <GridSelectField
+            key={idx}
+            options={SkillTag}
+            onChange={updateTags[idx]}
+            label='Tag'
+            defaultValue={defaultSkill.tags[idx] || SkillTag.INVALID}
+          />
+        ))}
+      </GridAccordion>
+      <GridModifiers
+        title='Attribute modifiers'
+        modifiers={initialSkillState.attributeModifiers}
+        updateModifier={updateAttributeModifier}
+        currentModifiers={attributeModifiers}
+        defaultModifiers={defaultSkill.attributeModifiers}
+      />
+      <GridModifiers
+        title='Damage modifiers'
+        modifiers={initialSkillState.damageModifiers}
+        updateModifier={updateDamageModifier}
+        currentModifiers={damageModifiers}
+        defaultModifiers={defaultSkill.damageModifiers}
+      />
+      <GridTextField
+        helperText='String'
+        onChange={updateEquipBundleName}
+        label='Equip bundle name'
+        defaultValue={defaultSkill.equipBundle.name}
+      />
+      <GridTextField
+        helperText={`Integer - Current value: ${ammo}`}
+        onChange={updateAmmo}
+        label='Ammo'
+        defaultValue={defaultSkill.ammo}
+      />
+      <GridTextField
+        helperText={`Integer - Current value: ${rechargeDuration}`}
+        onChange={updateRechargeDuration}
+        label='Recharge duration (ms)'
+        defaultValue={defaultSkill.rechargeDuration}
+      />
+      <GridTextField
+        helperText={`Integer - Current value: ${numTargets}`}
+        onChange={updateNumTargets}
+        label='Number of targets'
+        defaultValue={defaultSkill.numTargets}
+      />
     </Grid>
   );
 };
-
-const renderSelectField = (
-  options: object,
-  update: SelectUpdater<any>,
-  label: string,
-  defaultValue: string
-) => (
-  <Grid item xs={12} sm={6} md={4}>
-    <Autocomplete
-      options={Object.values(options)}
-      disableClearable
-      autoHighlight
-      autoComplete
-      autoSelect
-      defaultValue={defaultValue}
-      fullWidth
-      onChange={update}
-      renderInput={(params) => <TextField {...params} label={label} />}
-    />
-  </Grid>
-);
-
-const renderTextField = (
-  helperText: string,
-  update: TextUpdater,
-  label: string
-) => (
-  <Grid item xs={12} sm={6} md={4}>
-    <TextField
-      fullWidth
-      label={label}
-      helperText={helperText}
-      onChange={update}
-    />
-  </Grid>
-);
-
-const renderToggleField = (
-  update: ToggleUpdater,
-  label: string,
-  defaultValue: boolean
-) => (
-  <Grid item xs={12}>
-    <FormGroup>
-      <FormControlLabel
-        onChange={update}
-        control={<Switch defaultChecked={defaultValue} />}
-        label={label}
-      />
-    </FormGroup>
-  </Grid>
-);
-
-const renderModifiers = (
-  title: string,
-  modifiers: object,
-  updateModifier: TextUpdater,
-  currentModifiers: { [key: string]: number | undefined }
-) =>
-  renderAccordion(
-    false,
-    title,
-    Object.keys(modifiers).map((modifier) => (
-      <Grid key={modifier} item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label={upperFirst(
-            modifier
-              .replace(/([A-Z])/g, ' $1')
-              .toLowerCase()
-              .replace(/pct/g, 'percent')
-          )}
-          /* defaultValue={initialValue} */
-          inputProps={{ name: modifier }}
-          helperText={`Float - Current value: ${currentModifiers[modifier]}`}
-          onChange={updateModifier}
-        />
-      </Grid>
-    ))
-  );
-
-const renderAccordion = (
-  expanded: boolean,
-  title: string,
-  children: React.ReactNode
-) => (
-  <Accordion defaultExpanded={expanded}>
-    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-      <Typography>{title}</Typography>
-    </AccordionSummary>
-    <AccordionDetails>
-      <Grid container spacing={4}>
-        {children}
-      </Grid>
-    </AccordionDetails>
-  </Accordion>
-);
 
 export default Skill;

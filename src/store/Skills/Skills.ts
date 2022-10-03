@@ -208,6 +208,9 @@ export const skillsSlice = createSlice({
   name: 'skills',
   initialState: [initialSkillState],
   reducers: {
+    resetSkills: (state) => {
+      state = [initialSkillState];
+    },
     addSkill: (state) => {
       state.push(initialSkillState);
     },
@@ -339,49 +342,49 @@ export const skillsSlice = createSlice({
     },
     setStrikeEffectUniqueEffectTypeName: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onStrikeEffectApplication[effectIdx].uniqueEffectType.name =
         value;
     },
     setStrikeEffectType: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onStrikeEffectApplication[effectIdx].effectType =
         value as Effect;
     },
     setStrikeEffectDirection: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onStrikeEffectApplication[effectIdx].direction =
         value as Direction;
     },
     setStrikeEffectBaseDuration: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onStrikeEffectApplication[effectIdx].baseDuration =
         ensureUnsignedInt(value, 0);
     },
     setStrikeEffectNumStacks: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onStrikeEffectApplication[effectIdx].numStacks =
         ensureUnsignedInt(value, 0);
     },
     setStrikeEffectNumTargets: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onStrikeEffectApplication[effectIdx].numTargets =
         ensureUnsignedInt(value, 0);
     },
@@ -395,49 +398,49 @@ export const skillsSlice = createSlice({
     },
     setPulseEffectUniqueEffectTypeName: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onPulseEffectApplication[effectIdx].uniqueEffectType.name =
         value;
     },
     setPulseEffectType: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onPulseEffectApplication[effectIdx].effectType =
         value as Effect;
     },
     setPulseEffectDirection: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onPulseEffectApplication[effectIdx].direction =
         value as Direction;
     },
     setPulseEffectBaseDuration: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onPulseEffectApplication[effectIdx].baseDuration =
         ensureUnsignedInt(value, 0);
     },
     setPulseEffectNumStacks: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onPulseEffectApplication[effectIdx].numStacks =
         ensureUnsignedInt(value, 0);
     },
     setPulseEffectNumTargets: (
       state,
-      action: PayloadAction<{ idx: number; value: string; effectIdx: number }>
+      action: PayloadAction<[idx: number, value: string, effectIdx: number]>
     ) => {
-      const { idx, value, effectIdx } = action.payload;
+      const [idx, value, effectIdx] = action.payload;
       state[idx].onPulseEffectApplication[effectIdx].numTargets =
         ensureUnsignedInt(value, 0);
     },
@@ -458,9 +461,9 @@ export const skillsSlice = createSlice({
     },
     setChildSkillName: (
       state,
-      action: PayloadAction<[ idx: number, value: string, childIdx: number ]>
+      action: PayloadAction<[idx: number, value: string, childIdx: number]>
     ) => {
-      const [ idx, value, childIdx ] = action.payload;
+      const [idx, value, childIdx] = action.payload;
       state[idx].childSkillKeys[childIdx].name = value;
     },
     addTag: (state, action: PayloadAction<number>) => {
