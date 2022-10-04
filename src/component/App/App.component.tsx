@@ -14,6 +14,7 @@ import {
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { SkillType } from '../../store/Skills/Skills';
+import GridAddRemoveButtons from '../GridAddRemoveButtons';
 
 type Props = {
   tab: number;
@@ -107,9 +108,10 @@ const App: React.FC<Props> = (props: Props) => {
               </Grid>
             </Grid>
           </Box>
-          <Box>{renderSkills(skills, skillSearchMatches)}</Box>
-          <div onClick={addSkill}>Add</div>
-          <div onClick={removeSkill}>Remove</div>
+          <Box sx={{ marginBottom: '24px' }}>
+            {renderSkills(skills, skillSearchMatches)}
+          </Box>
+          <GridAddRemoveButtons onAdd={addSkill} onRemove={removeSkill} />
         </TabPanel>
         <TabPanel value={tab} index={1}>
           Effects
