@@ -262,9 +262,12 @@ export const Skill: React.FC<Props> = (props: Props) => {
         defaultExpanded={false}
         title='On strike effect applications'
       >
-        <GridAddRemoveButtons onAdd={addStrikeEffectApplication} onRemove={removeStrikeEffectApplication} />
-        {onStrikeEffectApplication.map((_, idx) => (
-          <React.Fragment>
+        <GridAddRemoveButtons
+          onAdd={addStrikeEffectApplication}
+          onRemove={removeStrikeEffectApplication}
+        />
+        {onStrikeEffectApplication.map((effect, idx) => (
+          <React.Fragment key={idx}>
             <GridTextField
               helperText='String'
               onChange={updateStrikeEffectUniqueEffectTypeName[idx]}
@@ -272,6 +275,112 @@ export const Skill: React.FC<Props> = (props: Props) => {
               defaultValue={
                 defaultSkill.onStrikeEffectApplication[idx]?.uniqueEffectType
                   ?.name
+              }
+            />
+            <GridSelectField
+              options={Effect}
+              onChange={updateStrikeEffectType[idx]}
+              label={`Index ${idx} effect type`}
+              defaultValue={
+                defaultSkill.onStrikeEffectApplication[idx]?.effectType ||
+                Effect.FURY
+              }
+            />
+            <GridSelectField
+              options={Direction}
+              onChange={updateStrikeEffectDirection[idx]}
+              label={`Index ${idx} effect direction`}
+              defaultValue={
+                defaultSkill.onStrikeEffectApplication[idx]?.direction ||
+                Direction.SELF
+              }
+            />
+            <GridTextField
+              helperText={`Integer - Current value: ${effect.baseDuration}`}
+              onChange={updateStrikeEffectBaseDuration[idx]}
+              label={`Index ${idx} effect base duration`}
+              defaultValue={
+                defaultSkill.onStrikeEffectApplication[idx]?.baseDuration || 0
+              }
+            />
+            <GridTextField
+              helperText={`Integer - Current value: ${effect.numStacks}`}
+              onChange={updateStrikeEffectNumStacks[idx]}
+              label={`Index ${idx} effect number of stacks`}
+              defaultValue={
+                defaultSkill.onStrikeEffectApplication[idx]?.numStacks || 0
+              }
+            />
+            <GridTextField
+              helperText={`Integer - Current value: ${effect.numTargets}`}
+              onChange={updateStrikeEffectNumTargets[idx]}
+              label={`Index ${idx} effect number of targets`}
+              defaultValue={
+                defaultSkill.onStrikeEffectApplication[idx]?.numTargets || 1
+              }
+            />
+          </React.Fragment>
+        ))}
+      </GridAccordion>
+      <GridAccordion
+        defaultExpanded={false}
+        title='On pulse effect applications'
+      >
+        <GridAddRemoveButtons
+          onAdd={addPulseEffectApplication}
+          onRemove={removePulseEffectApplication}
+        />
+        {onPulseEffectApplication.map((effect, idx) => (
+          <React.Fragment key={idx}>
+            <GridTextField
+              helperText='String'
+              onChange={updatePulseEffectUniqueEffectTypeName[idx]}
+              label={`Index ${idx} effect name`}
+              defaultValue={
+                defaultSkill.onPulseEffectApplication[idx]?.uniqueEffectType
+                  ?.name
+              }
+            />
+            <GridSelectField
+              options={Effect}
+              onChange={updatePulseEffectType[idx]}
+              label={`Index ${idx} effect type`}
+              defaultValue={
+                defaultSkill.onPulseEffectApplication[idx]?.effectType ||
+                Effect.FURY
+              }
+            />
+            <GridSelectField
+              options={Direction}
+              onChange={updatePulseEffectDirection[idx]}
+              label={`Index ${idx} effect direction`}
+              defaultValue={
+                defaultSkill.onPulseEffectApplication[idx]?.direction ||
+                Direction.SELF
+              }
+            />
+            <GridTextField
+              helperText={`Integer - Current value: ${effect.baseDuration}`}
+              onChange={updatePulseEffectBaseDuration[idx]}
+              label={`Index ${idx} effect base duration`}
+              defaultValue={
+                defaultSkill.onPulseEffectApplication[idx]?.baseDuration || 0
+              }
+            />
+            <GridTextField
+              helperText={`Integer - Current value: ${effect.numStacks}`}
+              onChange={updatePulseEffectNumStacks[idx]}
+              label={`Index ${idx} effect number of stacks`}
+              defaultValue={
+                defaultSkill.onPulseEffectApplication[idx]?.numStacks || 0
+              }
+            />
+            <GridTextField
+              helperText={`Integer - Current value: ${effect.numTargets}`}
+              onChange={updatePulseEffectNumTargets[idx]}
+              label={`Index ${idx} effect number of targets`}
+              defaultValue={
+                defaultSkill.onPulseEffectApplication[idx]?.numTargets || 1
               }
             />
           </React.Fragment>

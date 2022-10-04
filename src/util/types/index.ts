@@ -21,6 +21,7 @@ export enum WeaponType {
   TORCH = 'TORCH',
   SCEPTER = 'SCEPTER',
   FOCUS = 'FOCUS',
+  LONGBOW = 'LONGBOW',
   KIT_CONJURE = 'KIT_CONJURE',
   TOME = 'TOME',
 }
