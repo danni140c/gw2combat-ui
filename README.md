@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a hobby project, the goal is to provide a UI to create skills and effects in the JSON format used by [gw2combat](https://github.com/Mk-Chan/gw2combat).
+This is a hobby project, the goal is to provide a UI to create skills and effects in the JSON format used by [gw2combat](https://github.com/Mk-Chan/gw2combat).\
 It is a work in progress.
 
 ## Available Scripts
@@ -27,4 +27,4 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 Builds the app for production to the `build` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
+The build is minified and the filenames include the hashes.
