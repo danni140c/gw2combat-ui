@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.37c0e058.css",
-    "main.js": "/static/js/main.36678a18.js",
-    "static/js/787.1e5e64df.chunk.js": "/static/js/787.1e5e64df.chunk.js",
-    "index.html": "/index.html",
-    "main.37c0e058.css.map": "/static/css/main.37c0e058.css.map",
-    "main.36678a18.js.map": "/static/js/main.36678a18.js.map",
-    "787.1e5e64df.chunk.js.map": "/static/js/787.1e5e64df.chunk.js.map"
+    "main.css": "/gw2combat-ui/static/css/main.37c0e058.css",
+    "main.js": "/gw2combat-ui/static/js/main.45fe33ff.js",
+    "static/js/787.1e5e64df.chunk.js": "/gw2combat-ui/static/js/787.1e5e64df.chunk.js",
+    "index.html": "/gw2combat-ui/index.html",
+    "main.37c0e058.css.map": "/gw2combat-ui/static/css/main.37c0e058.css.map",
+    "main.45fe33ff.js.map": "/gw2combat-ui/static/js/main.45fe33ff.js.map",
+    "787.1e5e64df.chunk.js.map": "/gw2combat-ui/static/js/787.1e5e64df.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.37c0e058.css",
-    "static/js/main.36678a18.js"
+    "static/js/main.45fe33ff.js"
   ]
 }
