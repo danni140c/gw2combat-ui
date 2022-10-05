@@ -138,7 +138,7 @@ const renderSkills = (
             : 'none',
       }}
     >
-      <Skill skill={skill} idx={i} />
+      <Skill idx={i} />
     </Box>
   ));
 };

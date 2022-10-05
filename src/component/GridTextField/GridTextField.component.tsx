@@ -5,11 +5,18 @@ type Props = {
   helperText: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   label: string;
-  defaultValue: string | number | undefined;
+  defaultValue?: string | number | undefined;
+  name?: string;
 };
 
 export const GridTextField: React.FC<Props> = (props: Props) => {
-  const { helperText, onChange, label, defaultValue: defaultValueProp } = props;
+  const {
+    helperText,
+    onChange,
+    label,
+    defaultValue: defaultValueProp,
+    name,
+  } = props;
 
   const defaultValue = defaultValueProp !== undefined ? defaultValueProp : '';
 
@@ -21,6 +28,7 @@ export const GridTextField: React.FC<Props> = (props: Props) => {
         helperText={helperText}
         onChange={onChange}
         defaultValue={defaultValue}
+        inputProps={{ name: label }}
       />
     </Grid>
   );

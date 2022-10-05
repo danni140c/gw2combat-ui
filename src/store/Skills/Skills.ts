@@ -496,10 +496,15 @@ export const skillsSlice = createSlice({
       action: PayloadAction<{ idx: number; value: string; field: string }>
     ) => {
       const { idx, value, field } = action.payload;
-      state[idx].damageModifiers[field] = ensureFloat(
-        value,
-        initialSkillState.damageModifiers[field] as number
-      );
+      if (
+        state[idx].damageModifiers[field] !== undefined &&
+        initialSkillState.damageModifiers[field] !== undefined
+      ) {
+        state[idx].damageModifiers[field] = ensureFloat(
+          value,
+          initialSkillState.damageModifiers[field] as number
+        );
+      }
     },
     setEquipBundleName: (
       state,

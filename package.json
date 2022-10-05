@@ -1,7 +1,7 @@
 {
   "name": "gw2combat-ui",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "homepage": "https://danni140c.github.io/gw2combat-ui",
   "dependencies": {
     "@emotion/react": "^11.10.4",

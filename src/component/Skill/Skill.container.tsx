@@ -63,12 +63,15 @@ import {
   WeaponType,
 } from '../../util/types';
 
-type Props = PropsFromRedux & {
-  skill: SkillType;
+type OwnProps = {
   idx: number;
 };
 
-const mapStateToProps = (_: RootState) => ({});
+type Props = PropsFromRedux & OwnProps;
+
+const mapStateToProps = (state: RootState, ownProps: OwnProps) => ({
+  skill: state.skills[ownProps.idx],
+});
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
   ...bindActionCreators(
