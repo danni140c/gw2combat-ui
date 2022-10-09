@@ -48,7 +48,6 @@ import {
   setAmmo,
   setRechargeDuration,
   setNumTargets,
-  SkillType,
   SkillPayload,
   SkillTag,
   Direction,
