@@ -1,15 +1,16 @@
 {
   "files": {
     "main.css": "/gw2combat-ui/static/css/main.37c0e058.css",
-    "main.js": "/gw2combat-ui/static/js/main.ab4eb586.js",
+    "main.js": "/gw2combat-ui/static/js/main.a6edb7e9.js",
     "static/js/787.1e5e64df.chunk.js": "/gw2combat-ui/static/js/787.1e5e64df.chunk.js",
+    "service-worker.js": "/gw2combat-ui/service-worker.js",
     "index.html": "/gw2combat-ui/index.html",
     "main.37c0e058.css.map": "/gw2combat-ui/static/css/main.37c0e058.css.map",
-    "main.ab4eb586.js.map": "/gw2combat-ui/static/js/main.ab4eb586.js.map",
+    "main.a6edb7e9.js.map": "/gw2combat-ui/static/js/main.a6edb7e9.js.map",
     "787.1e5e64df.chunk.js.map": "/gw2combat-ui/static/js/787.1e5e64df.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.37c0e058.css",
-    "static/js/main.ab4eb586.js"
+    "static/js/main.a6edb7e9.js"
   ]
 }
